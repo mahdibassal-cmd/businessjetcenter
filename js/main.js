@@ -1,0 +1,22 @@
+(()=>{const WA='971585900792',MAIL='charter@businessjetcenter.net';
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const store={get(){try{return localStorage.getItem('bjc-lang')}catch(e){return null}},set(v){try{localStorage.setItem('bjc-lang',v)}catch(e){}}};
+const enTitle=document.title;
+function setLang(l){const ar=l==='ar';document.documentElement.lang=ar?'ar':'en';document.documentElement.dir=ar?'rtl':'ltr';
+$$('[data-ar]').forEach(el=>{if(el.dataset.en===undefined)el.dataset.en=el.innerHTML;el.innerHTML=ar?el.dataset.ar:el.dataset.en});
+$$('[data-ar-ph]').forEach(el=>{if(el.dataset.enPh===undefined)el.dataset.enPh=el.placeholder;el.placeholder=ar?el.dataset.arPh:el.dataset.enPh});
+document.title=ar?document.body.dataset.titleAr:enTitle;const b=$('#lang');b.textContent=ar?'English':'العربية';b.lang=ar?'en':'ar';store.set(l)}
+$('#lang').addEventListener('click',()=>setLang(document.documentElement.lang==='ar'?'en':'ar'));
+const q=new URLSearchParams(location.search).get('lang');const init=q||store.get();if(init==='ar')setLang('ar');
+const bg=$('#burger'),nav=$('#nav');bg.addEventListener('click',()=>{const o=nav.classList.toggle('open');bg.setAttribute('aria-expanded',o)});
+nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));
+const y=$('#yr');if(y)y.textContent=new Date().getFullYear();
+const f=$('#qform');if(f){const d=f.querySelector('[name=date]');d.min=new Date().toISOString().slice(0,10);
+f.addEventListener('submit',e=>{e.preventDefault();const via=(e.submitter||{}).value||'wa';const v=n=>(f.elements[n].value||'').trim();
+const ar=document.documentElement.lang==='ar';let bad=[];['from','to','date','pax','name','phone'].forEach(n=>{const ok=!!v(n);f.elements[n].classList.toggle('bad',!ok);if(!ok)bad.push(n)});
+if(via==='mail'&&v('email')&&!f.elements.email.checkValidity())bad.push('email');
+$('#qerr').textContent=bad.length?(ar?'يرجى تعبئة الحقول المطلوبة.':'Please complete the required fields.'):'';if(bad.length)return;
+const trip=f.querySelector('[name=trip]:checked').value;
+const msg=`Private jet quote request\nTrip: ${trip}\nFrom: ${v('from')}\nTo: ${v('to')}\nDate: ${v('date')}\nPassengers: ${v('pax')}\nName: ${v('name')}\nPhone: ${v('phone')}\nEmail: ${v('email')||'-'}\nNotes: ${v('notes')||'-'}`;
+const url=via==='mail'?`mailto:${MAIL}?subject=${encodeURIComponent('Quote request: '+v('from')+' to '+v('to'))}&body=${encodeURIComponent(msg)}`:`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+window.__lastQuote=url;if(via==='mail')location.href=url;else window.open(url,'_blank','noopener')})}})();
